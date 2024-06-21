@@ -53,4 +53,4 @@ function useEventListener<
   })
 }
 
-export default useEventListener
+export { useEventListener }

@@ -1,11 +1,24 @@
 {
   "name": "vhooks-ts",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Vue hook library, ready to use, written in Typescript.",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "dependencies": {
-    "@vitejs/plugin-vue": "^5.0.5",
     "csstype": "^3.1.3",
     "entities": "^4.5.0",
     "estree-walker": "^2.0.2",
@@ -14,11 +27,15 @@
     "picocolors": "^1.0.1",
     "postcss": "^8.4.38",
     "source-map-js": "^1.2.0",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.2",
+    "usehooks-ts": "^3.1.0",
+    "vhooks-ts": "^2.0.8",
     "vue": "^3.4.29"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup src"
+    "build": "tsup"
   },
   "author": "lhf",
   "license": "ISC"

@@ -9,5 +9,4 @@ export default defineConfig({
   treeshake: true,
   splitting: false,
   cjsInterop: true,
-  external: ['vue']
 })
