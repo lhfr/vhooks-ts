@@ -31,6 +31,10 @@ module.exports = {
               title: "Introduction",
               path: "/hooks/introduction",
             },
+            {
+              title: "Changes",
+              path: "/hooks/changes",
+            },
           ],
         },
         {
