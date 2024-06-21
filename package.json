@@ -3,7 +3,7 @@
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gh-pages -d docs/.vuepress/dist"
+    "deploy": "npm run build && gh-pages -d docs/.vuepress/dist"
   },
   "dependencies": {
     "gh-pages": "^6.1.1",
