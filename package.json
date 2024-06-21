@@ -3,37 +3,14 @@
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gh-pages -d docs/.vuepress/dist",
-    "build:npm": "tsup source"
+    "deploy": "gh-pages -d docs/.vuepress/dist"
   },
   "dependencies": {
     "gh-pages": "^6.1.1",
-    "tsup": "^8.1.0",
-    "typescript": "^5.4.5",
-    "vhooks-ts": "^1.0.5",
+    "vhooks-ts": "^1.0.0",
     "vuepress": "^1.9.10"
-  },
-  "name": "vhooks-ts",
-  "version": "1.0.6",
-  "type": "module",
-  "main": "./dist/index.js",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    }
   },
   "directories": {
     "doc": "docs"
-  },
-  "author": "lhf",
-  "license": "ISC",
-  "description": ""
+  }
 }
