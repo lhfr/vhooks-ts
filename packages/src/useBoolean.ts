@@ -2,7 +2,7 @@ import { ref, Ref } from "vue";
 
 type UseBooleanReturn = {
   value: Ref<boolean>;
-  setValue: (value: boolean) => void;
+  setValue: (x: boolean | ((x: boolean) => boolean)) => void;
   setTrue: () => void;
   setFalse: () => void;
   toggle: () => void;
