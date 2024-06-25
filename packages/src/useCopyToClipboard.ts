@@ -1,7 +1,6 @@
 import { ref, Ref } from "vue";
 
 type CopiedValue = Ref<string | null>;
-
 type CopyFn = (text: string) => Promise<boolean>;
 
 export function useCopyToClipboard(): [CopiedValue, CopyFn] {

@@ -9,4 +9,4 @@ vhooks-ts is a Vue hooks library, written in Typescript and easy to use. It prov
 ## Support By
 
 - [usehooks-ts](https://usehooks-ts.com/)
-- [vueuse](http://www.vueusejs.com/)
+- [vuepress](https://vuepress.vuejs.org/)
