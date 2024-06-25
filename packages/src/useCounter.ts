@@ -1,17 +1,20 @@
 import { ref, Ref } from "vue";
 
+type Dispatch<T> = (value: T) => void;
+type SetStateAction<T> = T | ((value: T) => T);
+
 type UseCounterReturn = {
   count: Ref<number>;
   increment: () => void;
   decrement: () => void;
   reset: () => void;
-  setCount: (x: number | ((x: number) => number)) => void;
+  setCount: Dispatch<SetStateAction<number>>;
 };
 
 export function useCounter(initialValue?: number): UseCounterReturn {
   const count = ref(initialValue ?? 0);
-  const setCount = (x: number | ((x: number) => number)) => {
-    count.value = typeof x === "number" ? x : x(count.value);
+  const setCount: Dispatch<SetStateAction<number>> = (x) => {
+    count.value = x instanceof Function ? x(count.value) : x;
   };
 
   const increment = () => {
