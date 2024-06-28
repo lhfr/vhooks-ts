@@ -1,4 +1,4 @@
-import { ref, Ref, watchEffect } from "vue";
+import { ref, unref, Ref, watchEffect } from "vue";
 
 import { useEventListener } from "./useEventListener";
 
@@ -21,7 +21,7 @@ type UseLocalStorageOptions<T> = {
 const IS_SERVER = typeof window === "undefined";
 
 export function useLocalStorage<T>(
-  key: string,
+  key: Ref<string> | string,
   initialValue: T | (() => T),
   options: UseLocalStorageOptions<T> = {}
 ): [Ref<T>, Dispatch<SetStateAction<T>>, () => void] {
@@ -70,10 +70,10 @@ export function useLocalStorage<T>(
     }
 
     try {
-      const raw = window.localStorage.getItem(key);
+      const raw = window.localStorage.getItem(unref(key));
       return raw ? deserializer(raw) : initialValueToUse;
     } catch (error) {
-      console.warn(`Error reading localStorage key “${key}”:`, error);
+      console.warn(`Error reading localStorage key “${unref(key)}”:`, error);
       return initialValueToUse;
     }
   };
@@ -101,15 +101,17 @@ export function useLocalStorage<T>(
       const newValue = value instanceof Function ? value(readValue()) : value;
 
       // Save to local storage
-      window.localStorage.setItem(key, serializer(newValue));
+      window.localStorage.setItem(unref(key), serializer(newValue));
 
       // Save state
       storedValue.value = newValue;
 
       // We dispatch a custom event so every similar useLocalStorage hook is notified
-      window.dispatchEvent(new StorageEvent("local-storage", { key }));
+      window.dispatchEvent(
+        new StorageEvent("local-storage", { key: unref(key) })
+      );
     } catch (error) {
-      console.warn(`Error setting localStorage key “${key}”:`, error);
+      console.warn(`Error setting localStorage key “${unref(key)}”:`, error);
     }
   };
 
@@ -117,7 +119,9 @@ export function useLocalStorage<T>(
     // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       console.warn(
-        `Tried removing localStorage key “${key}” even though environment is not a client`
+        `Tried removing localStorage key “${unref(
+          key
+        )}” even though environment is not a client`
       );
     }
 
@@ -125,13 +129,15 @@ export function useLocalStorage<T>(
       initialValue instanceof Function ? initialValue() : initialValue;
 
     // Remove the key from local storage
-    window.localStorage.removeItem(key);
+    window.localStorage.removeItem(unref(key));
 
     // Save state with default value
     storedValue.value = defaultValue;
 
     // We dispatch a custom event so every similar useLocalStorage hook is notified
-    window.dispatchEvent(new StorageEvent("local-storage", { key }));
+    window.dispatchEvent(
+      new StorageEvent("local-storage", { key: unref(key) })
+    );
   };
 
   watchEffect(() => {
