@@ -13,12 +13,12 @@ type Options<T, InitializeWithValue extends boolean | undefined> = {
 export function useReadLocalStorage<T>(
   key: Ref<string> | string,
   options: Options<T, false>
-): T | null | undefined;
+): Ref<T | null | undefined>;
 // CSR version
 export function useReadLocalStorage<T>(
   key: Ref<string> | string,
   options?: Partial<Options<T, true>>
-): T | null;
+): Ref<T | null>;
 export function useReadLocalStorage<T>(
   key: Ref<string> | string,
   options: Partial<Options<T, boolean>> = {}
