@@ -5,14 +5,14 @@ import { useEventListener } from "./useEventListener";
 declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface WindowEventMap {
-    "local-storage": CustomEvent;
+    "session-storage": CustomEvent;
   }
 }
 
 type Dispatch<T> = (value: T) => void;
 type SetStateAction<T> = T | ((value: T) => T);
 
-type UseLocalStorageOptions<T> = {
+type UseSessionStorageOptions<T> = {
   serializer?: (value: T) => string;
   deserializer?: (value: string) => T;
   initializeWithValue?: boolean;
@@ -20,10 +20,10 @@ type UseLocalStorageOptions<T> = {
 
 const IS_SERVER = typeof window === "undefined";
 
-export function useLocalStorage<T>(
+export function useSessionStorage<T>(
   key: Ref<string> | string,
   initialValue: T | (() => T),
-  options: UseLocalStorageOptions<T> = {}
+  options: UseSessionStorageOptions<T> = {}
 ): [Ref<T>, Dispatch<SetStateAction<T>>, () => void] {
   const { initializeWithValue = true } = options;
 
@@ -58,7 +58,7 @@ export function useLocalStorage<T>(
     return parsed as T;
   };
 
-  // Get from local storage then
+  // Get from session storage then
   // parse stored json or return initialValue
   const readValue = (): T => {
     const initialValueToUse =
@@ -70,10 +70,10 @@ export function useLocalStorage<T>(
     }
 
     try {
-      const raw = window.localStorage.getItem(unref(key));
+      const raw = window.sessionStorage.getItem(unref(key));
       return raw ? deserializer(raw) : initialValueToUse;
     } catch (error) {
-      console.warn(`Error reading localStorage key “${unref(key)}”:`, error);
+      console.warn(`Error reading sessionStorage key “${unref(key)}”:`, error);
       return initialValueToUse;
     }
   };
@@ -89,12 +89,12 @@ export function useLocalStorage<T>(
   ) as Ref<T>;
 
   // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
+  // ... persists the new value to sessionStorage.
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
     // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       console.warn(
-        `Tried setting localStorage key “${key}” even though environment is not a client`
+        `Tried setting sessionStorage key “${key}” even though environment is not a client`
       );
     }
 
@@ -102,18 +102,18 @@ export function useLocalStorage<T>(
       // Allow value to be a function so we have the same API as useState
       const newValue = value instanceof Function ? value(readValue()) : value;
 
-      // Save to local storage
-      window.localStorage.setItem(unref(key), serializer(newValue));
+      // Save to session storage
+      window.sessionStorage.setItem(unref(key), serializer(newValue));
 
       // Save state
       storedValue.value = newValue;
 
-      // We dispatch a custom event so every similar useLocalStorage hook is notified
+      // We dispatch a custom event so every similar useSessionStorage hook is notified
       window.dispatchEvent(
-        new StorageEvent("local-storage", { key: unref(key) })
+        new StorageEvent("session-storage", { key: unref(key) })
       );
     } catch (error) {
-      console.warn(`Error setting localStorage key “${unref(key)}”:`, error);
+      console.warn(`Error setting sessionStorage key “${key}”:`, error);
     }
   };
 
@@ -121,24 +121,22 @@ export function useLocalStorage<T>(
     // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       console.warn(
-        `Tried removing localStorage key “${unref(
-          key
-        )}” even though environment is not a client`
+        `Tried removing sessionStorage key “${key}” even though environment is not a client`
       );
     }
 
     const defaultValue =
       initialValue instanceof Function ? initialValue() : initialValue;
 
-    // Remove the key from local storage
-    window.localStorage.removeItem(unref(key));
+    // Remove the key from session storage
+    window.sessionStorage.removeItem(unref(key));
 
     // Save state with default value
     storedValue.value = defaultValue;
 
-    // We dispatch a custom event so every similar useLocalStorage hook is notified
+    // We dispatch a custom event so every similar useSessionStorage hook is notified
     window.dispatchEvent(
-      new StorageEvent("local-storage", { key: unref(key) })
+      new StorageEvent("session-storage", { key: unref(key) })
     );
   };
 
@@ -160,9 +158,9 @@ export function useLocalStorage<T>(
   // this only works for other documents, not the current one
   useEventListener("storage", handleStorageChange);
 
-  // this is a custom event, triggered in writeValueToLocalStorage
-  // See: useLocalStorage()
-  useEventListener("local-storage", handleStorageChange);
+  // this is a custom event, triggered in writeValueToSessionStorage
+  // See: useSessionStorage()
+  useEventListener("session-storage", handleStorageChange);
 
   return [storedValue, setValue, removeValue];
 }

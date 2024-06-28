@@ -66,7 +66,12 @@ export function useReadLocalStorage<T>(
   };
 
   const storedValue = ref(
-    initializeWithValue ? readValue() : undefined
+    (() => {
+      if (initializeWithValue) {
+        return readValue();
+      }
+      return undefined;
+    })()
   ) as Ref<T>;
 
   // Listen if localStorage changes
