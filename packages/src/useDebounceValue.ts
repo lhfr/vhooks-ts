@@ -1,4 +1,4 @@
-import { ref, Ref, UnwrapRef, ComputedRef } from "vue";
+import { ref, Ref, ComputedRef } from "vue";
 
 import type { DebouncedState } from "./useDebounceCallback";
 import { useDebounceCallback } from "./useDebounceCallback";
@@ -7,34 +7,24 @@ type UseDebounceValueOptions<T> = {
   leading?: boolean;
   trailing?: boolean;
   maxWait?: number;
-  equalityFn?: (left: T, right: T) => boolean;
 };
 
 export function useDebounceValue<T>(
   initialValue: T | (() => T),
-  delay: Ref<number>,
-  options?: Ref<UseDebounceValueOptions<T>>
-): [Ref<UnwrapRef<T>>, ComputedRef<DebouncedState<(value: T) => void>>] {
-  const eq =
-    options?.value.equalityFn ?? ((left: T, right: T) => left === right);
+  delay: number,
+  options?: UseDebounceValueOptions<T>
+): [Ref<T>, ComputedRef<DebouncedState<(value: T) => void>>] {
   const unwrappedInitialValue =
     initialValue instanceof Function ? initialValue() : initialValue;
-  const debouncedValue = ref<T>(unwrappedInitialValue);
-  const previousValueRef = ref<T | undefined>(unwrappedInitialValue);
+  const debouncedValue = ref<T>(unwrappedInitialValue) as Ref<T>;
 
   const updateDebouncedValue = useDebounceCallback(
-    ref((value) => {
+    (value) => {
       debouncedValue.value = value;
-    }),
+    },
     delay,
     options
   );
-
-  // Update the debounced value if the initial value changes
-  if (!eq(previousValueRef.value as T, unwrappedInitialValue)) {
-    updateDebouncedValue.value(unwrappedInitialValue);
-    previousValueRef.value = unwrappedInitialValue as UnwrapRef<T>;
-  }
 
   return [debouncedValue, updateDebouncedValue];
 }

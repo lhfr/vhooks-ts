@@ -1,4 +1,4 @@
-import { Ref, watch } from "vue";
+import { Ref, watchEffect } from "vue";
 
 import { useLocalStorage } from "./useLocalStorage";
 import { useMediaQuery } from "./useMediaQuery";
@@ -38,9 +38,9 @@ export function useDarkMode(options: DarkModeOptions = {}): DarkModeReturn {
   );
 
   // Update darkMode if os prefers changes
-  watch(isDarkOS, (value) => {
-    if (value !== isDarkMode.value) {
-      setDarkMode(value);
+  watchEffect(() => {
+    if (isDarkOS.value !== isDarkMode.value) {
+      setDarkMode(isDarkOS.value);
     }
   });
 

@@ -1,4 +1,4 @@
-import { ref, Ref, UnwrapRef, watchEffect } from "vue";
+import { ref, Ref, watchEffect } from "vue";
 
 import { useEventListener } from "./useEventListener";
 
@@ -24,7 +24,7 @@ export function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),
   options: UseLocalStorageOptions<T> = {}
-): [Ref<UnwrapRef<T>>, Dispatch<SetStateAction<T>>, () => void] {
+): [Ref<T>, Dispatch<SetStateAction<T>>, () => void] {
   const { initializeWithValue = true } = options;
 
   const serializer = (value: T): string => {
@@ -84,7 +84,7 @@ export function useLocalStorage<T>(
       : initialValue instanceof Function
       ? initialValue()
       : initialValue
-  );
+  ) as Ref<T>;
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
@@ -104,7 +104,7 @@ export function useLocalStorage<T>(
       window.localStorage.setItem(key, serializer(newValue));
 
       // Save state
-      storedValue.value = newValue as UnwrapRef<T>;
+      storedValue.value = newValue;
 
       // We dispatch a custom event so every similar useLocalStorage hook is notified
       window.dispatchEvent(new StorageEvent("local-storage", { key }));
@@ -128,14 +128,14 @@ export function useLocalStorage<T>(
     window.localStorage.removeItem(key);
 
     // Save state with default value
-    storedValue.value = defaultValue as UnwrapRef<T>;
+    storedValue.value = defaultValue;
 
     // We dispatch a custom event so every similar useLocalStorage hook is notified
     window.dispatchEvent(new StorageEvent("local-storage", { key }));
   };
 
   watchEffect(() => {
-    storedValue.value = readValue() as UnwrapRef<T>;
+    storedValue.value = readValue();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   });
 
@@ -143,7 +143,7 @@ export function useLocalStorage<T>(
     if ((event as StorageEvent).key && (event as StorageEvent).key !== key) {
       return;
     }
-    storedValue.value = readValue() as UnwrapRef<T>;
+    storedValue.value = readValue();
   };
 
   // this only works for other documents, not the current one

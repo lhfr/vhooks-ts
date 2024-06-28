@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import { Ref, watchEffect } from "vue";
 
 import { useBoolean } from "./useBoolean";
 import { useCounter } from "./useCounter";
@@ -63,7 +63,12 @@ export function useCountdown({
     }
   };
 
-  useInterval(countdownCallback, isCountdownRunning ? intervalMs : null);
+  watchEffect(() => {
+    useInterval(
+      countdownCallback,
+      isCountdownRunning.value ? intervalMs : null
+    );
+  });
 
   return [count, { startCountdown, stopCountdown, resetCountdown }];
 }

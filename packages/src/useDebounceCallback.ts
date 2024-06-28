@@ -1,4 +1,4 @@
-import { ref, Ref, computed, ComputedRef, onUnmounted, watchEffect } from "vue";
+import { ref, Ref, computed, ComputedRef, onUnmounted } from "vue";
 import debounce from "lodash.debounce";
 
 // TypeScript types
@@ -19,9 +19,9 @@ export type DebouncedState<T extends (...args: any) => ReturnType<T>> = (
 ) => ReturnType<T> | (undefined & ControlFunctions);
 
 export function useDebounceCallback<T extends (...args: any) => ReturnType<T>>(
-  func: Ref<T>,
-  delay = ref(500),
-  options?: Ref<DebounceOptions>
+  func: T,
+  delay: number = 500,
+  options?: DebounceOptions
 ): ComputedRef<DebouncedState<T>> {
   const debouncedFunc: Ref<ReturnType<typeof debounce>> | undefined = ref();
 
@@ -57,9 +57,6 @@ export function useDebounceCallback<T extends (...args: any) => ReturnType<T>>(
   });
 
   // Update the debounced function ref whenever func, delay, or options change
-  watchEffect(() => {
-    debouncedFunc.value = debounce(func, delay, options);
-  });
 
   return debounced;
 }
