@@ -1,4 +1,4 @@
-import { ref, Ref, computed, ComputedRef, onUnmounted } from "vue";
+import { ref, Ref, computed, onUnmounted } from "vue";
 import debounce from "lodash.debounce";
 
 // TypeScript types
@@ -22,7 +22,7 @@ export function useDebounceCallback<T extends (...args: any) => ReturnType<T>>(
   func: T,
   delay: number = 500,
   options?: DebounceOptions
-): ComputedRef<DebouncedState<T>> {
+): Ref<DebouncedState<T>> {
   const debouncedFunc: Ref<ReturnType<typeof debounce>> | undefined = ref();
 
   onUnmounted(() => {
