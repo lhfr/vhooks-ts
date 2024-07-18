@@ -1,0 +1,1 @@
+Custom hook that tracks the intersection of a DOM element with its containing element or the viewport using the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).

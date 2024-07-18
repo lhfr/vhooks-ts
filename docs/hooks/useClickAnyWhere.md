@@ -1,19 +1,17 @@
 # useClickAnyWhere
 
-这个简单的 Vue 钩子在页面级别为您提供了一个点击事件监听器。
-
-相关 hooks:
-
-- [useEventListener()](useEventListener)
+Custom hook that handles click events anywhere on the document.
 
 ## Usage
 
 ```vue
 <template>
-  <p>Click count: {{ count }}</p>
+  <div>
+    <p>Click count: {{ count }}</p>
+  </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useClickAnyWhere } from "vhooks-ts";
 
@@ -30,9 +28,9 @@ useClickAnyWhere(() => {
 ```js
 import { useEventListener } from "vhooks-ts";
 
-type Handler = (event: MouseEvent) => void;
-
-export default function useClickAnyWhere(handler: Handler) {
-  useEventListener("click", handler);
+export function useClickAnyWhere(handler: (event: MouseEvent) => void) {
+  useEventListener("click", (event) => {
+    handler(event);
+  });
 }
 ```

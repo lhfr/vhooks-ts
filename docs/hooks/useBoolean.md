@@ -1,44 +1,65 @@
 # useBoolean
 
-一个简单的钩子来处理布尔值。
-
-相关 hooks:
-
-- [useToggle()](useToggle)
+Custom hook that handles boolean state with useful utility functions.
 
 ## Usage
 
 ```vue
 <template>
-  <p>{{ state }}</p>
-  <button @click="setTrue">setTrue</button>
-  <button @click="setFalse">setFalse</button>
-  <button @click="toggle()">toggle</button>
+  <div>
+    <p>
+      Value is <code>{{ value.toString() }}</code>
+    </p>
+    <button @click="setTrue">set true</button>
+    <button @click="setFalse">set false</button>
+    <button @click="toggle">toggle</button>
+    <button @click="customToggle">custom toggle</button>
+  </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { useBoolean } from "vhooks-ts";
 
-const { state, setTrue, setFalse, toggle } = useBoolean();
+const { value, setValue, setTrue, setFalse, toggle } = useBoolean(false);
+
+// Just an example to use "setValue"
+const customToggle = () => {
+  setValue((x: boolean) => !x);
+};
 </script>
 ```
 
 ## Hook
 
 ```js
-import { useToggle } from "vhooks-ts";
+import { ref, Ref } from "vue";
 
-export default function useBoolean(defaultValue?: Boolean) {
-  const { state, toggle } = useToggle(defaultValue);
+type Dispatch<T> = (value: T) => void;
+type SetStateAction<T> = T | ((value: T) => T);
 
-  const setTrue = () => toggle(true);
-  const setFalse = () => toggle(false);
+type UseBooleanReturn = {
+  value: Ref<boolean>,
+  setValue: Dispatch<SetStateAction<boolean>>,
+  setTrue: () => void,
+  setFalse: () => void,
+  toggle: () => void,
+};
 
-  return {
-    state,
-    setTrue,
-    setFalse,
-    toggle,
+export function useBoolean(defaultValue = false): UseBooleanReturn {
+  if (typeof defaultValue !== "boolean") {
+    throw new Error("defaultValue must be `true` or `false`");
+  }
+  const value = ref(defaultValue);
+  const setValue: Dispatch<SetStateAction<boolean>> = (x) => {
+    value.value = x instanceof Function ? x(value.value) : x;
   };
+
+  const setTrue = () => setValue(true);
+
+  const setFalse = () => setValue(false);
+
+  const toggle = () => setValue((x) => !x);
+
+  return { value, setValue, setTrue, setFalse, toggle };
 }
 ```
